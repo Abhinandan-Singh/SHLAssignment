@@ -1,0 +1,14 @@
+GET http://localhost:3001/projects
+
+###
+# POST http://localhost:3001/project/new
+# Content-Type: application/json
+
+# {
+#     "Project":{
+#         "Title": "Project 152",
+#         "Technologies": "Java, Spring Framework"
+#     }    
+# }
+
+
