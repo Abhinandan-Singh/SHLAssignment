@@ -1,16 +1,45 @@
 const express = require('express')
 const mongoose = require('mongoose')
 const cors = require('cors')
-const {OpenAI} = require('openai');
-
-// const config = new Configuration({
-//   apiKey: "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"
-// })
+const OpenAI = require('openai');
 
 const openai = new OpenAI({
-    apiKey: "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"
-})
+    apiKey: "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", // defaults to process.env["OPENAI_API_KEY"]
+});
 
+const dbSchema = {
+    Project:{
+        Title:{
+            type: String,
+            required: true
+        },
+        Technologies:{
+            type: String,
+            required: true
+        }
+    },
+    Technical_Skillset:{
+        Frontend:{
+            type: String,
+        },
+        Backend:{
+            type: String,
+        },
+        Databases:{
+            type: String,
+        },
+        Infrastructure:{
+            type: String,
+        }
+    },
+    Other_Information:{
+        Availability:{
+            type: String,
+        }
+    }
+};
+
+const dbSchemaString = JSON.stringify(dbSchema);
 
 const app = express();
 const PORT = 3001;
@@ -36,25 +65,29 @@ app.get('/projects', async(req, res) => {
 app.post('/smartSearch', async(req, res) => {
     try{
         const userQuery = req.body.text;
-        const completion = await openai.completions.create({
+        const promptMessage = `The schema of my mongodb database is as following: 
+        '${dbSchemaString}'
+        Translate the user query ${userQuery} into a structured search query for the given MongoDB database. Return me the search query enclosed within triple #`;
+        const completion = await openai.chat.completions.create({
+            messages: [
+                { 
+                    role: 'user',
+                    content: promptMessage,
+                }],
             model: 'gpt-3.5-turbo',
-            prompt: `Translate the user query '${userQuery}' into a structured search query for MongoDB database.`,
-            max_tokens: 512,
-            temperature: 0
-        });
-        console.log(completion);
-    
-        const generatedQuery = completion.choices[0].text;
-        res.json({query: generatedQuery});
+          });
+          
+          
+        const generatedQuery = completion.choices[0].message.content;
+        const projects = await Project.find(generatedQuery.slice(3, -3));
+        res.json(projects);
         //const searchResults = await executeDBQuery(generatedQuery);
     }catch(error){
         console.error();
     }
 });
 
-// async function executeDBQuery(query){
-//     console.log(query);
-// }
+
 
 
 

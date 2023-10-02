@@ -24,14 +24,19 @@ const App = () => {
     const resJson = res.data;
     setProjects(resJson);
   }
+
+  const updateProjects = (val) => {
+    setProjects(val);
+  }
   
   useEffect(()=>{
     GetProjects();
+    console.log("Use Effect rendered");
   }, []);
 
   return (
     <div className="App">
-      <Header/>
+      <Header updateProjects={updateProjects}/>
       <div className="container">
         {
           projects.map((project) => {

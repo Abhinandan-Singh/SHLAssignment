@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 import Axios from 'axios';
 
-const Header = () => {
+const Header = ({updateProjects}) => {
 
     const [prompt, setPrompt] = useState('');
-    const [response, setResponse] = useState('');
+    //const [response, setResponse] = useState('');
 
     const handleKeyDown = (e) => {
         if(e.key === "Enter"){
@@ -19,11 +19,13 @@ const Header = () => {
 
     const handleSubmit = async() => {
         try{
-            const response = await Axios.post("http://localhost:3001/smartSearch", {text:prompt});
-            if(response.status === 200){
-                setResponse(response.data);
+            const res = await Axios.post("http://localhost:3001/smartSearch", {text:prompt});
+            if(res.status === 200){
+                const resJson = res.data;
+                console.log(resJson);
+                updateProjects(resJson);
             }else{
-                console.error('Error: ', response.statusText);
+                console.error('Error: ', res.statusText);
             }
         }catch(err){
             console.error(err);
